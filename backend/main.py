@@ -24,7 +24,7 @@ from jose import jwt, JWTError
 app = FastAPI()
 
 origins = ["http://localhost:5173",
-           "https://url-shortner-iota-five.vercel.app/",]
+           "https://url-shortner-iota-five.vercel.app",]
 
 app.add_middleware(
     CORSMiddleware,
