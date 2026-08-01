@@ -51,7 +51,7 @@ const UrlSection = ({get_urls}) => {
                 original_url : url
             })
             console.log(response.data)
-            setShortUrl(`http://localhost:8000/${response.data.short_token}`)
+            setShortUrl(`${import.meta.env.VITE_API_URL}/${response.data.short_token}`)
             setShorten(true)
         }
         catch(error){
