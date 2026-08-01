@@ -23,7 +23,6 @@ from jose import jwt, JWTError
 
 app = FastAPI()
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -34,6 +33,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 Base.metadata.create_all(bind=engine)
@@ -200,20 +200,6 @@ def update_url(input_token: str, db: db_dependency, update: URLUpdate, user: use
     db.refresh(data)
     return{"message" : "URL updated successfully"}
 
-    
-
-@app.get("/{input_token}")
-def token_redirect(input_token : str, db: db_dependency):
-    data = db.query(UrlData).filter(UrlData.short_token == input_token).first()
-
-    if data is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
-    data.clicks = data.clicks+1
-    db.commit()
-    return RedirectResponse(url = data.original_url)
-
-
 @app.delete("/urls/{input_token}")
 def delete_url(input_token: str, db: db_dependency, user:user_dependency):
     data = db.query(UrlData).filter(UrlData.short_token == input_token, UrlData.owner_id == user["id"]).first()
@@ -246,3 +232,13 @@ def generate_qr(input_token: str, db: db_dependency, request: Request, user: use
     buffer,
     media_type="image/png")
 
+@app.get("/{input_token}")
+def token_redirect(input_token : str, db: db_dependency):
+    data = db.query(UrlData).filter(UrlData.short_token == input_token).first()
+
+    if data is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    data.clicks = data.clicks+1
+    db.commit()
+    return RedirectResponse(url = data.original_url)
